@@ -12,6 +12,7 @@ export default function Header() {
     { href: "#pricing", label: "Pricing" },
     { href: "#booking", label: "Book Now" },
     { href: "#location", label: "Location" },
+    { href: "/status", label: "My Booking" },
   ];
 
   return (
