@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import PricingSection from "@/components/PricingSection";
 import BookingSection from "@/components/BookingSection";
-import PaymentSection from "@/components/PaymentSection";
 import LocationSection from "@/components/LocationSection";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
@@ -32,7 +31,6 @@ export default function Home() {
         <HeroSection />
         <PricingSection />
         <BookingSection />
-        <PaymentSection />
         <LocationSection />
       </main>
       <Footer />

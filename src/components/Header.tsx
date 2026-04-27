@@ -9,11 +9,9 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: "#booking", label: "Book Now" },
     { href: "#pricing", label: "Pricing" },
-    { href: "#payment", label: "Payment" },
+    { href: "#booking", label: "Book Now" },
     { href: "#location", label: "Location" },
-    { href: "#contact", label: "Contact" },
   ];
 
   return (
