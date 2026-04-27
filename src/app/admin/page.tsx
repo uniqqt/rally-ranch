@@ -52,7 +52,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState("");
 
-  const ADMIN_PASSWORD = "rallyranch2024";
+  const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "rallyranch2024";
 
   const fetchBookings = async () => {
     setLoading(true);
