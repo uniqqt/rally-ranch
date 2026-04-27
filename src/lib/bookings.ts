@@ -6,6 +6,7 @@ import {
   where,
   doc,
   updateDoc,
+  deleteDoc,
   orderBy,
   Timestamp,
 } from "firebase/firestore";
@@ -56,4 +57,8 @@ export async function updateBookingStatus(
   status: Booking["status"]
 ): Promise<void> {
   await withTimeout(updateDoc(doc(db, "bookings", id), { status }));
+}
+
+export async function deleteBooking(id: string): Promise<void> {
+  await withTimeout(deleteDoc(doc(db, "bookings", id)));
 }

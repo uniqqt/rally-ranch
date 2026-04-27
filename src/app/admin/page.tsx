@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllBookings, updateBookingStatus } from "@/lib/bookings";
+import { getAllBookings, updateBookingStatus, deleteBooking } from "@/lib/bookings";
 import { Booking } from "@/types/booking";
 import { format } from "date-fns";
 import {
@@ -15,6 +15,7 @@ import {
   PhilippinePeso,
   Eye,
   X,
+  Trash2,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
@@ -47,6 +48,7 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | Booking["status"]>("all");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -83,6 +85,21 @@ export default function AdminPage() {
       toast.error("Update failed.");
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Permanently delete this booking?")) return;
+    setDeletingId(id);
+    try {
+      await deleteBooking(id);
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+      if (selectedBooking?.id === id) setSelectedBooking(null);
+      toast.success("Booking deleted.");
+    } catch {
+      toast.error("Delete failed.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -307,6 +324,14 @@ export default function AdminPage() {
                                 <XCircle className="w-4 h-4" />
                               </button>
                             )}
+                            <button
+                              disabled={deletingId === booking.id}
+                              onClick={() => handleDelete(booking.id!)}
+                              className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -381,6 +406,14 @@ export default function AdminPage() {
                   Cancel
                 </button>
               )}
+              <button
+                disabled={deletingId === selectedBooking.id}
+                onClick={() => handleDelete(selectedBooking.id!)}
+                className="p-2.5 bg-red-600/20 hover:bg-red-600/40 border border-red-600/40 text-red-400 rounded-xl transition-colors"
+                title="Delete booking"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
