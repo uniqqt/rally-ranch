@@ -66,7 +66,15 @@ export async function deleteBooking(id: string): Promise<void> {
 
 export async function getBookingById(id: string): Promise<Booking | null> {
   if (!isFirebaseConfigured()) return null;
+  const upper = id.toUpperCase();
+
+  // Try exact match first
   const snap = await withTimeout(getDoc(doc(db, "bookings", id)));
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() } as Booking;
+  if (snap.exists()) return { id: snap.id, ...snap.data() } as Booking;
+
+  // Fall back to prefix search (short ID match)
+  const all = await withTimeout(getDocs(collection(db, "bookings")));
+  const match = all.docs.find((d) => d.id.toUpperCase().startsWith(upper));
+  if (!match) return null;
+  return { id: match.id, ...match.data() } as Booking;
 }
