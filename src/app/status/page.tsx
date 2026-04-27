@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { getBookingById } from "@/lib/bookings";
 import { Booking } from "@/types/booking";
@@ -36,7 +36,7 @@ const STATUS_CONFIG = {
   },
 };
 
-export default function StatusPage() {
+function StatusContent() {
   const searchParams = useSearchParams();
   const [bookingId, setBookingId] = useState(searchParams.get("id") ?? "");
   const [booking, setBooking] = useState<Booking | null>(null);
@@ -166,5 +166,13 @@ export default function StatusPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StatusPage() {
+  return (
+    <Suspense>
+      <StatusContent />
+    </Suspense>
   );
 }
