@@ -77,38 +77,18 @@ export default function BookingSection() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
 
-  // ── Proof upload ──────────────────────────────────────────
-  const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) { toast.error("Please upload an image file."); return; }
-    if (file.size > 5 * 1024 * 1024)    { toast.error("File must be under 5MB.");        return; }
-    setProofFile(file);
-    setProofPreview(URL.createObjectURL(file));
-  };
-
   // ── Submit ────────────────────────────────────────────────
-  const handleSubmit = async () => {
+  const handleSubmit = async (file: File) => {
     if (!selectedDate || selectedSlotIds.length === 0) return;
-    if (!form.name.trim() || !form.phone.trim()) {
-      toast.error("Please fill in your name and phone number.");
-      return;
-    }
-    if (!proofFile) {
-      toast.error("Please upload your GCash payment screenshot.");
-      return;
-    }
 
     setSubmitting(true);
     try {
-      // 1. Upload proof image to Cloudinary
       let proofUrl: string | undefined;
       if (isCloudinaryConfigured()) {
         setSubmitStatus("Uploading payment screenshot…");
-        proofUrl = await uploadProof(proofFile);
+        proofUrl = await uploadProof(file);
       }
 
-      // 2. Submit booking via API route (saves to Firestore + sends email)
       setSubmitStatus("Confirming your booking…");
       const booking = {
         date:           format(selectedDate, "yyyy-MM-dd"),
@@ -140,10 +120,23 @@ export default function BookingSection() {
       setStep("confirmed");
     } catch {
       toast.error("Booking failed. Please try again.");
+      setProofFile(null);
+      setProofPreview(null);
     } finally {
       setSubmitting(false);
       setSubmitStatus("");
     }
+  };
+
+  // ── Proof upload — auto-submits on selection ──────────────
+  const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please upload an image file."); return; }
+    if (file.size > 5 * 1024 * 1024)    { toast.error("File must be under 5MB.");        return; }
+    setProofFile(file);
+    setProofPreview(URL.createObjectURL(file));
+    handleSubmit(file);
   };
 
   const resetBooking = () => {
@@ -481,15 +474,14 @@ export default function BookingSection() {
                   Take a screenshot of your GCash receipt and upload it here. Your slot is confirmed once we verify payment.
                 </p>
 
-                {proofPreview ? (
+                {submitting ? (
+                  <div className="rounded-xl border border-blue-500/30 bg-slate-900/50 p-8 flex flex-col items-center gap-3">
+                    <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+                    <p className="text-blue-300 text-sm font-medium">{submitStatus || "Processing…"}</p>
+                  </div>
+                ) : proofPreview ? (
                   <div className="relative rounded-xl overflow-hidden border border-green-500/30 bg-slate-900/50">
                     <img src={proofPreview} alt="Proof of payment" className="w-full max-h-64 object-contain" />
-                    <button
-                      onClick={() => { setProofFile(null); setProofPreview(null); }}
-                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
                     <div className="absolute bottom-0 left-0 right-0 bg-green-500/10 border-t border-green-500/20 px-3 py-2 flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-400" />
                       <span className="text-green-400 text-xs font-medium">{proofFile?.name}</span>
@@ -505,16 +497,14 @@ export default function BookingSection() {
                 )}
               </div>
 
-              <div className="flex gap-3 mt-8">
-                <button onClick={() => setStep("details")}
-                  className="flex-1 border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white font-semibold py-3 rounded-xl transition-colors">
-                  ← Back
-                </button>
-                <button disabled={submitting} onClick={handleSubmit}
-                  className="flex-grow bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
-                  {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Confirming…</> : "Confirm Booking ✓"}
-                </button>
-              </div>
+              {!submitting && (
+                <div className="mt-6">
+                  <button onClick={() => setStep("details")}
+                    className="w-full border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white font-semibold py-3 rounded-xl transition-colors">
+                    ← Back
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -560,12 +550,19 @@ export default function BookingSection() {
                 </div>
               </div>
 
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 text-sm text-amber-300/80 mb-8">
-                Status is <strong>Pending</strong> until payment is verified. We&apos;ll contact you via phone to confirm.
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 text-sm text-amber-300/80 mb-4">
+                Status is <strong>Pending</strong> until payment is verified.
               </div>
 
+              <a
+                href={`/status?id=${confirmed.id}`}
+                className="block w-full text-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 hover:text-white font-semibold py-3 rounded-xl transition-colors mb-3"
+              >
+                Check Booking Status →
+              </a>
+
               <button onClick={resetBooking}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold px-8 py-3 rounded-xl transition-all duration-200">
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl transition-all duration-200">
                 Book Another Session
               </button>
             </div>

@@ -2,6 +2,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
   query,
   where,
   doc,
@@ -61,4 +62,11 @@ export async function updateBookingStatus(
 
 export async function deleteBooking(id: string): Promise<void> {
   await withTimeout(deleteDoc(doc(db, "bookings", id)));
+}
+
+export async function getBookingById(id: string): Promise<Booking | null> {
+  if (!isFirebaseConfigured()) return null;
+  const snap = await withTimeout(getDoc(doc(db, "bookings", id)));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as Booking;
 }

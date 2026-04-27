@@ -84,13 +84,27 @@ export default function AdminPage() {
     setUpdatingId(id);
     try {
       await updateBookingStatus(id, status);
-      setBookings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, status } : b))
-      );
+      const booking = bookings.find((b) => b.id === id);
+      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
       if (selectedBooking?.id === id) {
         setSelectedBooking((prev) => prev ? { ...prev, status } : null);
       }
       toast.success(`Booking ${status}!`);
+
+      if (booking?.email && (status === "confirmed" || status === "cancelled")) {
+        fetch("/api/notify-customer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: booking.email,
+            name: booking.name,
+            date: booking.date,
+            timeSlotLabels: booking.timeSlotLabels,
+            price: booking.price,
+            status,
+          }),
+        });
+      }
     } catch {
       toast.error("Update failed.");
     } finally {
