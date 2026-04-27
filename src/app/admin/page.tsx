@@ -451,10 +451,18 @@ export default function AdminPage() {
                 { label: "Email", value: selectedBooking.email || "—" },
                 { label: "Amount", value: `₱${selectedBooking.price}` },
                 { label: "Notes", value: selectedBooking.notes || "—" },
+                ...(selectedBooking.proofUrl ? [{ label: "Payment Proof", value: "view" }] : []),
               ].map((row) => (
                 <div key={row.label} className="flex justify-between py-2 border-b border-slate-800">
                   <span className="text-slate-400 text-sm">{row.label}</span>
-                  <span className="text-white text-sm font-medium text-right max-w-[60%]">{row.value}</span>
+                  {row.label === "Payment Proof" ? (
+                    <a href={selectedBooking.proofUrl} target="_blank" rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 text-sm font-medium underline">
+                      View Screenshot
+                    </a>
+                  ) : (
+                    <span className="text-white text-sm font-medium text-right max-w-[60%]">{row.value}</span>
+                  )}
                 </div>
               ))}
               <div className="flex justify-between py-2">
@@ -464,10 +472,6 @@ export default function AdminPage() {
                   {STATUS_CONFIG[selectedBooking.status].label}
                 </span>
               </div>
-            </div>
-
-            <div className="mt-4 bg-blue-500/5 border border-blue-500/20 rounded-xl p-3">
-              <p className="text-blue-300 text-xs">Proof of payment is sent via Facebook Messenger or SMS by the customer.</p>
             </div>
 
             <div className="flex gap-3 mt-6">
