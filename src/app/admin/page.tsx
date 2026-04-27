@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAllBookings, updateBookingStatus, deleteBooking } from "@/lib/bookings";
+import { getAdminPassword, setAdminPassword } from "@/lib/settings";
 import { Booking } from "@/types/booking";
 import { format } from "date-fns";
 import {
@@ -16,6 +17,7 @@ import {
   Eye,
   X,
   Trash2,
+  KeyRound,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
@@ -49,10 +51,14 @@ export default function AdminPage() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState("");
 
-  const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "rallyranch2024";
+  const [adminPassword, setAdminPasswordState] = useState("");
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -65,6 +71,10 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    getAdminPassword().then(setAdminPasswordState);
+  }, []);
 
   useEffect(() => {
     if (authed) fetchBookings();
@@ -85,6 +95,25 @@ export default function AdminPage() {
       toast.error("Update failed.");
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!newPassword.trim()) { toast.error("Password cannot be empty."); return; }
+    if (newPassword !== confirmPassword) { toast.error("Passwords do not match."); return; }
+    if (newPassword.length < 6) { toast.error("Password must be at least 6 characters."); return; }
+    setChangingPassword(true);
+    try {
+      await setAdminPassword(newPassword);
+      setAdminPasswordState(newPassword);
+      setShowChangePassword(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      toast.success("Password updated!");
+    } catch {
+      toast.error("Failed to update password.");
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -136,13 +165,13 @@ export default function AdminPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && password === ADMIN_PASSWORD && setAuthed(true)}
+            onKeyDown={(e) => e.key === "Enter" && password === adminPassword && setAuthed(true)}
             placeholder="Enter admin password"
             className="w-full bg-slate-800 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 mb-4"
           />
           <button
             onClick={() => {
-              if (password === ADMIN_PASSWORD) {
+              if (password === adminPassword) {
                 setAuthed(true);
               } else {
                 toast.error("Incorrect password.");
@@ -190,6 +219,14 @@ export default function AdminPage() {
             >
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <button
+              onClick={() => setShowChangePassword(true)}
+              className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors"
+              title="Change password"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span className="hidden sm:inline">Password</span>
             </button>
             <Link
               href="/"
@@ -343,6 +380,52 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* Change password modal */}
+      {showChangePassword && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4" onClick={() => setShowChangePassword(false)}>
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                <KeyRound className="w-5 h-5 text-purple-400" /> Change Password
+              </h2>
+              <button onClick={() => setShowChangePassword(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-1.5">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full bg-slate-800 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-1.5">Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat new password"
+                  onKeyDown={(e) => e.key === "Enter" && handleChangePassword()}
+                  className="w-full bg-slate-800 border border-slate-600 text-white placeholder-slate-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                />
+              </div>
+            </div>
+            <button
+              disabled={changingPassword}
+              onClick={handleChangePassword}
+              className="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-40 text-white font-bold py-3 rounded-xl transition-all"
+            >
+              {changingPassword ? "Saving…" : "Update Password"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Booking detail modal */}
       {selectedBooking && (
