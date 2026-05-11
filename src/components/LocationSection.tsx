@@ -2,11 +2,22 @@
 
 import { MapPin, Clock, Phone, Navigation } from "lucide-react";
 
+function getOpenStatus(): { isOpen: boolean; label: string } {
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
+  const isExtended = day >= 4; // Thu–Sat
+  const isOpen = hour >= 16 && hour < (isExtended ? 24 : 23);
+  return { isOpen, label: isOpen ? "Open Now" : "Opens at 4:00 PM" };
+}
+
 const GOOGLE_MAPS_URL = "https://maps.app.goo.gl/4N6cydf9YHFfJYmE9";
 const EMBED_URL = "https://www.google.com/maps?q=9.4839931,123.1413974&z=17&output=embed";
 const PHONE = "0961-812-7180";
 
 export default function LocationSection() {
+  const { isOpen, label } = getOpenStatus();
+
   return (
     <section id="location" className="py-24 bg-slate-900 relative">
       <div className="absolute inset-0">
@@ -17,10 +28,7 @@ export default function LocationSection() {
         <div className="text-center mb-14">
           <span className="text-blue-400 text-sm font-semibold uppercase tracking-widest">Location</span>
           <h2 className="text-4xl font-extrabold text-white mt-2">
-            Find{" "}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Our Courts
-            </span>
+            Find Our Courts
           </h2>
           <p className="text-slate-400 mt-3">Conveniently located and easy to access.</p>
         </div>
@@ -111,8 +119,8 @@ export default function LocationSection() {
                 ))}
               </div>
               <div className="mt-3 flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-green-400 text-xs font-medium">Open Today</span>
+                <span className={`w-2 h-2 rounded-full ${isOpen ? "bg-green-400 animate-pulse" : "bg-slate-500"}`} />
+                <span className={`text-xs font-medium ${isOpen ? "text-green-400" : "text-slate-500"}`}>{label}</span>
               </div>
             </div>
 

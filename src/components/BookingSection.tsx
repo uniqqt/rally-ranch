@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { format, isPast, startOfDay } from "date-fns";
+import { format, isPast } from "date-fns";
 import Image from "next/image";
 import {
   ChevronLeft, ChevronRight, Calendar, User, Phone, Mail,
@@ -161,10 +161,7 @@ export default function BookingSection() {
         <div className="text-center mb-14">
           <span className="text-purple-400 text-sm font-semibold uppercase tracking-widest">Reserve</span>
           <h2 className="text-4xl font-extrabold text-white mt-2">
-            Book Your{" "}
-            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              Court Session
-            </span>
+            Book Your <span className="text-blue-400">Court Session</span>
           </h2>
           <p className="text-slate-400 mt-3">Select a date and one or more time slots.</p>
         </div>
@@ -233,7 +230,7 @@ export default function BookingSection() {
                     return (
                       <button key={day.toISOString()} disabled={isDisabled}
                         onClick={() => { setSelectedDate(day); setSelectedSlotIds([]); }}
-                        className={`aspect-square rounded-xl text-sm font-medium transition-all duration-150 flex items-center justify-center
+                        className={`aspect-square rounded-full text-sm font-medium transition-all duration-150 flex items-center justify-center
                           ${isDisabled ? "text-slate-700 cursor-not-allowed" : "hover:bg-slate-700 cursor-pointer"}
                           ${isSelected ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30 scale-110" : ""}
                           ${isTdy && !isSelected ? "ring-1 ring-blue-500 text-blue-400" : !isSelected ? "text-slate-300" : ""}
@@ -330,7 +327,7 @@ export default function BookingSection() {
 
               <button disabled={!selectedDate || selectedSlotIds.length === 0}
                 onClick={() => setStep("details")}
-                className="mt-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-purple-500/30">
+                className="mt-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-4 rounded-full transition-all duration-200 shadow-lg hover:shadow-purple-500/30">
                 Continue to Details →
               </button>
             </div>
@@ -403,11 +400,11 @@ export default function BookingSection() {
 
               <div className="flex gap-3 mt-8">
                 <button onClick={() => setStep("datetime")}
-                  className="flex-1 border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white font-semibold py-3 rounded-xl transition-colors">
+                  className="flex-1 border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white font-semibold py-3 rounded-full transition-colors">
                   ← Back
                 </button>
                 <button disabled={!form.name.trim() || !form.phone.trim()} onClick={() => setStep("payment")}
-                  className="flex-grow bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all duration-200">
+                  className="flex-grow bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-full transition-all duration-200">
                   Continue to Payment →
                 </button>
               </div>
@@ -500,7 +497,7 @@ export default function BookingSection() {
               {!submitting && (
                 <div className="mt-6">
                   <button onClick={() => setStep("details")}
-                    className="w-full border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white font-semibold py-3 rounded-xl transition-colors">
+                    className="w-full border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white font-semibold py-3 rounded-full transition-colors">
                     ← Back
                   </button>
                 </div>
@@ -556,13 +553,13 @@ export default function BookingSection() {
 
               <a
                 href={`/status?id=${confirmed.id}`}
-                className="block w-full text-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 hover:text-white font-semibold py-3 rounded-xl transition-colors mb-3"
+                className="block w-full text-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 hover:text-white font-semibold py-3 rounded-full transition-colors mb-3"
               >
                 Check Booking Status →
               </a>
 
               <button onClick={resetBooking}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl transition-all duration-200">
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-full transition-all duration-200">
                 Book Another Session
               </button>
             </div>

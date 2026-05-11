@@ -61,7 +61,7 @@ export default function Footer() {
               {[
                 { href: "#booking", label: "Book a Court" },
                 { href: "#pricing", label: "Pricing" },
-                { href: "#payment", label: "Payment Info" },
+                { href: "/status", label: "My Booking" },
                 { href: "#location", label: "Location" },
                 { href: FB_URL, label: "Follow on Facebook", external: true },
               ].map((link) => (

@@ -8,6 +8,7 @@ const tiers = [
     time: "4:00 PM – 6:00 PM",
     note: "All days",
     price: 150,
+    priceColor: "text-blue-400",
     color: "from-blue-500 to-cyan-500",
     border: "border-blue-500/30",
     icon: <Clock className="w-5 h-5" />,
@@ -20,6 +21,7 @@ const tiers = [
     time: "6:00 PM – 11:00 PM",
     note: "Thu–Sat until 12:00 AM",
     price: 200,
+    priceColor: "text-purple-400",
     color: "from-purple-500 to-pink-500",
     border: "border-purple-500/30",
     icon: <Zap className="w-5 h-5" />,
@@ -50,10 +52,7 @@ export default function PricingSection() {
         <div className="text-center mb-14">
           <span className="text-blue-400 text-sm font-semibold uppercase tracking-widest">Rates</span>
           <h2 className="text-4xl font-extrabold text-white mt-2">
-            Simple, Transparent{" "}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Pricing
-            </span>
+            Simple, Transparent Pricing
           </h2>
           <p className="text-slate-400 mt-3 max-w-xl mx-auto">
             Each session is 1 hour. Choose your preferred time and enjoy the courts.
@@ -99,7 +98,7 @@ export default function PricingSection() {
               </div>
 
               <div className="mb-6">
-                <span className={`text-5xl font-extrabold bg-gradient-to-r ${tier.color} bg-clip-text text-transparent`}>
+                <span className={`text-5xl font-extrabold ${tier.priceColor}`}>
                   ₱{tier.price}
                 </span>
                 <span className="text-slate-400 text-sm ml-2">/ session</span>

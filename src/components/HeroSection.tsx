@@ -29,7 +29,7 @@ export default function HeroSection() {
 
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-tight">
           Book Your{" "}
-          <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+          <span className="text-blue-400">
             Pickleball Court
           </span>
         </h1>
@@ -56,19 +56,6 @@ export default function HeroSection() {
           </a>
         </div>
 
-        {/* Stats */}
-        <div className="mt-16 grid grid-cols-3 gap-6 max-w-md mx-auto">
-          {[
-            { value: "8", label: "Time Slots" },
-            { value: "4PM–12AM", label: "Thu–Sat" },
-            { value: "₱150+", label: "Starting Price" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-2xl font-extrabold text-white">{stat.value}</div>
-              <div className="text-slate-500 text-xs mt-1 uppercase tracking-wide">{stat.label}</div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Scroll indicator */}
